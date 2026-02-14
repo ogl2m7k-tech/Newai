@@ -1,0 +1,35 @@
+name: Haber Guncelleyici
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Her saat başı otomatik çalıştırır
+  workflow_dispatch: # İstediğinde 'Actions' sekmesinden elinle de başlatabilirsin
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub'ın dosyayı güncelleyip kaydedebilmesi için gerekli
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v4
+
+      - name: Python Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Kütüphaneleri Yükle
+        run: pip install requests
+
+      - name: Botu Çalıştır
+        run: python main.py
+
+      - name: Değişiklikleri Kaydet ve Paylaş
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add index.html
+          git commit -m "Otomatik Haber Güncellemesi: $(date)" || exit 0
+          git push
+          
